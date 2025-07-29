@@ -1,0 +1,47 @@
+/* static/css/style.css */
+/*
+  This file is primarily a placeholder.
+  Tailwind CSS works by scanning your HTML/JS files for utility classes
+  and generating the necessary CSS at build time.
+  For a simple Flask app serving static files, you'd typically include
+  the Tailwind CDN script in your HTML for development, or set up a build process
+  (e.g., using `npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch`)
+  to generate a `dist/output.css` file which you would then link.
+
+  For this example, we'll rely on the Tailwind CDN directly in the HTML files
+  to keep it simple and runnable without a build step.
+  Therefore, this file might remain empty or contain only custom CSS if needed.
+*/
+/* You can add any custom CSS here if Tailwind doesn't cover a specific need */
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom styles for message box */
+.message-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.message-box.error {
+    background-color: #f44336; /* Red */
+}
+
+.message-box.show {
+    display: block;
+    opacity: 1;
+}
+

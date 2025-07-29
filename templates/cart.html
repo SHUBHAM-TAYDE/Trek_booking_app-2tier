@@ -1,0 +1,182 @@
+<!-- templates/cart.html -->
+{% extends "base.html" %}
+
+{% block title %}Your Cart - Trek Booking App{% endblock %}
+
+{% block content %}
+<h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Your Shopping Cart</h1>
+
+<div id="cart-container" class="bg-white rounded-lg shadow-lg p-8">
+    <div id="cart-items-list">
+        <!-- Cart items will be loaded here by JavaScript -->
+        <p class="text-gray-600 text-center" id="loading-message">Loading cart...</p>
+    </div>
+
+    <div id="cart-summary" class="mt-8 pt-6 border-t border-gray-200 hidden">
+        <div class="flex justify-between items-center text-2xl font-bold text-gray-800">
+            <span>Total:</span>
+            <span id="cart-total-price">$0.00</span>
+        </div>
+        <div class="mt-6 text-center">
+            <button id="proceed-to-booking-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 transform hover:scale-105">
+                Proceed to Booking
+            </button>
+        </div>
+    </div>
+    <div id="empty-cart-message" class="text-center text-gray-600 text-lg py-10 hidden">
+        Your cart is empty. <a href="/treks" class="text-blue-600 hover:underline">Explore treks</a> to add items!
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartItemsList = document.getElementById('cart-items-list');
+        const cartTotalPrice = document.getElementById('cart-total-price');
+        const cartSummary = document.getElementById('cart-summary');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const loadingMessage = document.getElementById('loading-message');
+        const proceedToBookingBtn = document.getElementById('proceed-to-booking-btn');
+
+        // No need for API_BASE_URL when using relative paths and Flask serves both
+        // const API_BASE_URL = 'http://127.0.0.1:5000';
+
+        const fetchCart = async () => {
+            loadingMessage.classList.remove('hidden');
+            cartItemsList.innerHTML = ''; // Clear previous items
+
+            try {
+                // Use relative path for the fetch call
+                const response = await fetch('/api/cart');
+                const data = await response.json();
+
+                loadingMessage.classList.add('hidden');
+
+                if (response.ok && data.cart_items && data.cart_items.length > 0) {
+                    emptyCartMessage.classList.add('hidden');
+                    cartSummary.classList.remove('hidden');
+
+                    data.cart_items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex items-center justify-between border-b border-gray-200 py-4 last:border-b-0';
+                        itemDiv.innerHTML = `
+                            <div class="flex items-center space-x-4">
+                                <img src="${item.image_url}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md shadow-sm">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">${item.name}</h3>
+                                    <p class="text-gray-600">Price: $${item.price.toFixed(2)} per person</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <label for="quantity-${item.trek_id}" class="sr-only">Quantity for ${item.name}</label>
+                                <input type="number" id="quantity-${item.trek_id}" value="${item.quantity}" min="1"
+                                    class="w-20 p-2 border border-gray-300 rounded-md text-center text-lg focus:ring-blue-500 focus:border-blue-500 quantity-input"
+                                    data-trek-id="${item.trek_id}">
+                                <span class="text-lg font-semibold text-gray-800">$${item.total_item_price.toFixed(2)}</span>
+                                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm remove-item-btn" data-trek-id="${item.trek_id}">
+                                    Remove
+                                </button>
+                            </div>
+                        `;
+                        cartItemsList.appendChild(itemDiv);
+                    });
+
+                    cartTotalPrice.textContent = `$${data.total_price.toFixed(2)}`;
+
+                    // Add event listeners for quantity changes and remove buttons
+                    document.querySelectorAll('.quantity-input').forEach(input => {
+                        input.addEventListener('change', async (event) => {
+                            const trekId = event.target.dataset.trekId;
+                            const newQuantity = parseInt(event.target.value);
+                            if (isNaN(newQuantity) || newQuantity < 0) {
+                                showMessage('Quantity must be a non-negative number.', 'error');
+                                event.target.value = event.target.defaultValue; // Revert to previous valid value
+                                return;
+                            }
+                            await updateCartItem(trekId, newQuantity);
+                        });
+                    });
+
+                    document.querySelectorAll('.remove-item-btn').forEach(button => {
+                        button.addEventListener('click', async (event) => {
+                            const trekId = event.target.dataset.trekId;
+                            await removeCartItem(trekId);
+                        });
+                    });
+
+                } else {
+                    // If response is OK but cart is empty or data structure is unexpected
+                    emptyCartMessage.classList.remove('hidden');
+                    cartSummary.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching cart:', error);
+                loadingMessage.classList.add('hidden');
+                // Ensure showMessage is defined before calling it
+                if (typeof showMessage === 'function') {
+                    showMessage('Failed to load cart. Please try again.', 'error');
+                }
+                emptyCartMessage.classList.remove('hidden'); // Show empty cart message on error
+                cartSummary.classList.add('hidden');
+            }
+        };
+
+        const updateCartItem = async (trekId, quantity) => {
+            try {
+                // Use relative path for the fetch call
+                const response = await fetch('/api/cart/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ trek_id: trekId, quantity: quantity })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    fetchCart(); // Re-fetch cart to update UI
+                } else {
+                    showMessage(data.message, 'error');
+                    fetchCart(); // Re-fetch to revert to correct state if update failed
+                }
+            } catch (error) {
+                console.error('Error updating cart item:', error);
+                showMessage('An error occurred while updating cart.', 'error');
+            }
+        };
+
+        const removeCartItem = async (trekId) => {
+            try {
+                // Use relative path for the fetch call
+                const response = await fetch('/api/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ trek_id: trekId })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    fetchCart(); // Re-fetch cart to update UI
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error removing cart item:', error);
+                showMessage('An error occurred while removing item from cart.', 'error');
+            }
+        };
+
+        if (proceedToBookingBtn) {
+            proceedToBookingBtn.addEventListener('click', () => {
+                window.location.href = '/booking';
+            });
+        }
+
+        // Initial fetch of cart items when the page loads
+        fetchCart();
+    });
+</script>
+{% endblock %}

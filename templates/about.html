@@ -1,0 +1,37 @@
+<!-- templates/about.html -->
+{% extends "base.html" %}
+
+{% block title %}About Us - Trek Booking App{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">About TrekBooker</h1>
+
+    <div class="prose max-w-none text-gray-700 leading-relaxed">
+        <p class="mb-4">Welcome to <strong>TrekBooker</strong>, your ultimate companion for exploring the world's most magnificent trails and mountains. We are passionate about connecting adventurers with unforgettable trekking experiences, offering a curated selection of journeys that cater to all skill levels and aspirations.</p>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Our Mission</h2>
+        <p class="mb-4">Our mission is to make trekking accessible, safe, and enjoyable for everyone. We strive to provide comprehensive information, seamless booking processes, and exceptional customer support to ensure your adventure starts and ends with a smile.</p>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">What We Offer</h2>
+        <ul class="list-disc list-inside mb-6">
+            <li class="mb-2"><strong>Diverse Treks:</strong> From challenging high-altitude expeditions to serene nature walks, our portfolio includes a wide range of treks across various continents.</li>
+            <li class="mb-2"><strong>Expert Guidance:</strong> We partner with experienced local guides and reputable tour operators who prioritize your safety and provide deep insights into the local culture and environment.</li>
+            <li class="mb-2"><strong>Easy Booking:</strong> Our user-friendly platform allows you to browse, select, and book your dream trek with just a few clicks.</li>
+            <li class="mb-2"><strong>Transparent Pricing:</strong> No hidden fees. We believe in clear and upfront pricing so you know exactly what you're paying for.</li>
+            <li class="mb-2"><strong>Customer Support:</strong> Our dedicated support team is always ready to assist you with any queries or concerns before, during, and after your trek.</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Our Commitment to DevOps</h2>
+        <p class="mb-4">As a platform built with modern software development practices, TrekBooker is designed with DevOps principles at its core. This means we focus on:</p>
+        <ul class="list-disc list-inside mb-6">
+            <li class="mb-2"><strong>Continuous Integration/Continuous Delivery (CI/CD):</strong> Ensuring rapid and reliable deployment of new features and bug fixes.</li>
+            <li class="mb-2"><strong>Automation:</strong> Automating testing, deployment, and infrastructure management to minimize manual errors and speed up delivery.</li>
+            <li class="mb-2"><strong>Monitoring and Feedback:</strong> Continuously monitoring application performance and user experience to identify and address issues proactively.</li>
+            <li class="mb-2"><strong>Scalability:</strong> Building a robust and scalable architecture that can handle increasing user demand.</li>
+        </ul>
+
+        <p class="text-center mt-8 text-lg font-semibold text-blue-700">Join the TrekBooker community and embark on your next great adventure!</p>
+    </div>
+</div>
+{% endblock %}

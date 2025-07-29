@@ -1,0 +1,155 @@
+<!-- templates/booking.html -->
+{% extends "base.html" %}
+
+{% block title %}Complete Your Booking - Trek Booking App{% endblock %}
+
+{% block content %}
+<h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Complete Your Booking</h1>
+
+<div class="bg-white rounded-lg shadow-lg p-8 max-w-3xl mx-auto">
+    <div id="booking-summary-section">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Order Summary</h2>
+        <div id="booking-items-list" class="mb-6 border-b border-gray-200 pb-4">
+            <!-- Booking items will be loaded here by JavaScript -->
+            <p class="text-gray-600 text-center" id="booking-loading-message">Loading cart summary...</p>
+        </div>
+        <div class="flex justify-between items-center text-xl font-bold text-gray-800 mb-6">
+            <span>Grand Total:</span>
+            <span id="booking-total-price">$0.00</span>
+        </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Details</h2>
+    <form id="booking-form" class="space-y-6">
+        <div>
+            <label for="fullName" class="block text-lg font-medium text-gray-700 mb-2">Full Name</label>
+            <input type="text" id="fullName" name="fullName" required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-lg">
+        </div>
+        <div>
+            <label for="email" class="block text-lg font-medium text-gray-700 mb-2">Email Address</label>
+            <input type="email" id="email" name="email" required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-lg">
+        </div>
+        <div>
+            <label for="phone" class="block text-lg font-medium text-gray-700 mb-2">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required
+                   class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-lg">
+        </div>
+        <div>
+            <label for="address" class="block text-lg font-medium text-gray-700 mb-2">Address</label>
+            <textarea id="address" name="address" rows="3" required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-lg"></textarea>
+        </div>
+
+        <div class="mt-8 text-center">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 transform hover:scale-105">
+                Confirm Booking
+            </button>
+        </div>
+    </form>
+    <div id="empty-cart-message-booking" class="text-center text-gray-600 text-lg py-10 hidden">
+        Your cart is empty. Please add treks to your cart before proceeding to booking. <a href="/treks" class="text-blue-600 hover:underline">Explore treks</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const bookingItemsList = document.getElementById('booking-items-list');
+        const bookingTotalPrice = document.getElementById('booking-total-price');
+        const bookingLoadingMessage = document.getElementById('booking-loading-message');
+        const bookingForm = document.getElementById('booking-form');
+        const emptyCartMessageBooking = document.getElementById('empty-cart-message-booking');
+        const bookingSummarySection = document.getElementById('booking-summary-section');
+
+        // Define API_BASE_URL to explicitly target the Flask backend
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+
+        const fetchCartForBooking = async () => {
+            bookingLoadingMessage.classList.remove('hidden');
+            bookingItemsList.innerHTML = ''; // Clear previous items
+
+            try {
+                // Use API_BASE_URL for the fetch call
+                const response = await fetch(`${API_BASE_URL}/api/cart`);
+                const data = await response.json();
+
+                bookingLoadingMessage.classList.add('hidden');
+
+                if (response.ok && data.cart_items && data.cart_items.length > 0) {
+                    emptyCartMessageBooking.classList.add('hidden');
+                    bookingForm.classList.remove('hidden'); // Show the form
+                    bookingSummarySection.classList.remove('hidden'); // Show summary
+
+                    data.cart_items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex items-center justify-between py-2';
+                        itemDiv.innerHTML = `
+                            <div class="text-gray-700">
+                                <span class="font-semibold">${item.name}</span> x ${item.quantity}
+                            </div>
+                            <span class="font-semibold text-gray-800">$${item.total_item_price.toFixed(2)}</span>
+                        `;
+                        bookingItemsList.appendChild(itemDiv);
+                    });
+                    bookingTotalPrice.textContent = `$${data.total_price.toFixed(2)}`;
+                } else {
+                    emptyCartMessageBooking.classList.remove('hidden');
+                    bookingForm.classList.add('hidden'); // Hide the form if cart is empty
+                    bookingSummarySection.classList.add('hidden'); // Hide summary
+                }
+            } catch (error) {
+                console.error('Error fetching cart for booking:', error);
+                bookingLoadingMessage.classList.add('hidden');
+                showMessage('Failed to load cart summary. Please try again.', 'error');
+                emptyCartMessageBooking.classList.remove('hidden');
+                bookingForm.classList.add('hidden');
+                bookingSummarySection.classList.add('hidden');
+            }
+        };
+
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                // Collect form data (for demonstration, these are not sent to backend in this simple example)
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
+
+                try {
+                    // Use API_BASE_URL for the fetch call
+                    const response = await fetch(`${API_BASE_URL}/api/book`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        // No need to send form data to /api/book as it processes current session cart
+                        body: JSON.stringify({})
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(data.message + ` Booking ID: ${data.booking_id}`, 'success', 5000);
+                        // Redirect to a confirmation page or home
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 3000); // Redirect after 3 seconds
+                    } else {
+                        showMessage(data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error during booking:', error);
+                    showMessage('An error occurred during booking. Please try again.', 'error');
+                }
+            });
+        }
+
+        fetchCartForBooking();
+    });
+</script>
+{% endblock %}
+
