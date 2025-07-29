@@ -9,8 +9,6 @@ This is a two-tier web application for booking treks, built with Flask (Python) 
 * [Prerequisites](#prerequisites)
 * [Setup and Installation](#setup-and-installation)
 * [Running the Application](#running-the-application)
-* [DevOps Considerations](#devops-considerations)
-* [Project Structure](#project-structure)
 
 ## Features
 
