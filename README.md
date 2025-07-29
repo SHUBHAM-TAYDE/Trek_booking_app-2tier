@@ -104,37 +104,3 @@ Follow these steps to get the application running on your local machine:
     * Proceed to booking.
 
     **Note:** Since the data is in-memory, any registered users, cart items, or bookings will be lost when you stop and restart the `app.py` server.
-
-## DevOps Considerations
-
-This project is structured to facilitate DevOps practices:
-
-* **Separation of Concerns:** Clear distinction between frontend and backend allows for independent development, testing, and deployment.
-* **Containerization Readiness:** Both the Flask backend and the static frontend assets can be easily containerized using Docker.
-    * A `Dockerfile` could be created for the Flask app.
-    * Frontend assets could be served by a lightweight web server like Nginx, also in a Docker container.
-* **CI/CD Pipeline:** The project can be integrated into CI/CD pipelines (e.g., Jenkins, GitLab CI, GitHub Actions) for automated testing, building, and deployment.
-* **Scalability:** The two-tier design allows for horizontal scaling of both the backend (e.g., running multiple Flask instances behind a load balancer) and the frontend (e.g., using a CDN for static assets).
-* **Monitoring:** Flask applications can be easily instrumented for monitoring performance and errors.
-
-## Project Structure
-trek_booking_app/
-├── app.py                  # Flask backend application
-├── templates/              # Jinja2 HTML templates
-│   ├── base.html           # Base layout for all pages
-│   ├── index.html          # Home page
-│   ├── treks.html          # List of all treks
-│   ├── trek_detail.html    # Detailed view of a single trek
-│   ├── cart.html           # Shopping cart page
-│   ├── booking.html        # Booking confirmation page
-│   ├── offers.html         # Special offers page
-│   ├── about.html          # About Us page
-│   ├── contact.html        # Contact Us page
-│   ├── login.html          # User login page
-│   ├── register.html       # User registration page
-│   └── 404.html            # Custom 404 Not Found page
-└── static/                 # Static assets (CSS, JS)
-├── css/
-│   └── style.css       # Custom CSS (mostly Tailwind setup)
-└── js/
-└── main.js         # Common JavaScript functions (e.g., showMessage, auth UI updates)
