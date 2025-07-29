@@ -50,7 +50,11 @@ Follow these steps to get the application running on your local machine:
 1.  **Clone or Download the Project:**
     If you have the project files, ensure they are organized as described in the "Project Structure" section below.
 
-2.  **Create a Virtual Environment:**
+    ```bash
+    git clone https://github.com/your-username/your-repo-name.git
+    ```
+
+3.  **Create a Virtual Environment:**
     It is highly recommended to use a Python virtual environment to manage dependencies and avoid conflicts with your system's Python installation.
     Open your terminal or command prompt and navigate to the root directory of your project (`trek_booking_app/`).
 
@@ -58,7 +62,7 @@ Follow these steps to get the application running on your local machine:
     python3 -m venv venv
     ```
 
-3.  **Activate the Virtual Environment:**
+4.  **Activate the Virtual Environment:**
     * **On Linux/macOS:**
         ```bash
         source venv/bin/activate
@@ -73,7 +77,7 @@ Follow these steps to get the application running on your local machine:
         ```
     Your terminal prompt should change to indicate the virtual environment is active (e.g., `(venv) your_username@your_machine:~/trek_booking_app$`).
 
-4.  **Install Dependencies:**
+5.  **Install Dependencies:**
     With the virtual environment activated, install the required Python packages:
 
     ```bash
